@@ -1,70 +1,60 @@
-#### Codigo del micro:bit 
-
-```py
-def mostrar_verde():
-    basic.show_leds("""
-        . # # # .
-        # . . . #
-        # . . . #
-        # . . . #
-        . # # # .
-        """)
-def mostrar_amarillo():
-    basic.show_leds("""
-    . . . . .
-    . . . . .
-    # # # # #
-    . . . . .
-    . . . . .
-    """)
-def mostrar_rojo():
-    basic.show_leds("""
-    # . . . #
-    . # . # .
-    . . # . .
-    . # . # .
-    # . . . #
-    """)
-```
-
-#### Codigo en MicroPython
+#### Codigo
 
 ```py
 from microbit import *
 import utime
 
-class Semaforo:
-    def __init__(self,initState,interval,prevState):
-        self.State = "Verde"
-        self.prevState = ""
-        self.startTime = 0
-        self.interval = interval
-    
-    def update(self):
+class TrafficLight:
+    def __init__(self):
+        self.state = "RED"
+        self.startTime = utime.ticks_ms()
+        self.RED_TIME = 5000      
+        self.GREEN_TIME = 5000     
+        self.YELLOW_TIME = 2000   
         
-        if self.State == "Verde":
-            self.startTime = utime.ticks.ms()
-            self.State = "Amarillo"
-            self.prevState = "Verde"
-            mostrar_verde()
-        elif self.State == "Amarillo":
-            mostrar_amarillo()
-            if utime.ticks_diff(utime.ticks_ms(),self.startTime) > self.interval:
-                self.startTime = utime.ticks_ms()
-                if prevState == "Verde":
-                    self.State = "Rojo"
-                    
-                else:
-                    self.State = "Verde"
+    def update(self):
+        currentTime = utime.ticks_ms()
+        elapsed = utime.ticks_diff(currentTime, self.startTime)
+        
+        if self.state == "RED":
+            
+            display.clear()
+            display.set_pixel(2, 2, 9)
+            
+           
+            if elapsed > self.RED_TIME:
+                self.state = "GREEN"
+                self.startTime = currentTime
                 
-        elif self.State == "Rojo":
-            self.State = "Amarillo"
-            self.prevState = "Rojo"
-            mostrar_rojo()
- 
-Semaforo1 = (1000)
+        elif self.state == "GREEN":
+            
+            display.clear()
+            display.set_pixel(2, 4, 9)
+            display.set_pixel(1, 4, 9)
+            display.set_pixel(3, 4, 9)
+            
+           
+            if elapsed > self.GREEN_TIME:
+                self.state = "YELLOW"
+                self.startTime = currentTime
+                
+        elif self.state == "YELLOW":
+           
+            display.clear()
+            display.set_pixel(0, 2, 9)
+            display.set_pixel(1, 2, 9)
+            display.set_pixel(2, 2, 9)
+            display.set_pixel(3, 2, 9)
+            display.set_pixel(4, 2, 9)
+            
+           
+            if elapsed > self.YELLOW_TIME:
+                self.state = "RED"
+                self.startTime = currentTime
 
 
-while true:
-    Semaforo1.update()
+semaphore = TrafficLight()
+
+while True:
+    semaphore.update()
 ```
